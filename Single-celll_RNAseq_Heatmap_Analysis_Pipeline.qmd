@@ -1,0 +1,131 @@
+# ----------------------------- #
+#      SINGLE-CELL RNA-SEQ     #
+#   Heatmap Analysis Pipeline  #
+# ----------------------------- #
+
+# Description:
+# This script loads single-cell RNA-seq log2 fold-change values for a custom gene list
+# across four distinct cell types. It filters genes of interest, optionally applies
+# a p-value threshold, averages duplicate entries, and visualizes the results
+# as clustered heatmaps.
+
+# ----------------------------- #
+#       Load Dependencies       #
+# ----------------------------- #
+
+
+```{r}
+library(dplyr)       # For data manipulation
+library(tidyverse)   # For streamlined data wrangling
+library(pheatmap)    # For heatmap visualization
+library(tibble)      # For managing rownames
+```
+
+# ----------------------------- #
+#     Helper Function: Filter   #
+# ----------------------------- #
+
+```{r}
+# Filters and averages log2 fold-change values for genes of interest.
+# If a p-value cutoff is provided, filters for significance.
+process_dataset <- function(data, genes_of_interest, pval_cutoff = NULL) {
+  data$Symbol <- toupper(data$Symbol)
+  genes_of_interest$Symbol <- toupper(genes_of_interest$Gene)
+
+  filtered <- data %>%
+    filter(Symbol %in% genes_of_interest$Symbol)
+
+  if (!is.null(pval_cutoff)) {
+    filtered <- filtered %>% filter(p_adjusted_value < pval_cutoff)
+  }
+
+  filtered %>%
+    group_by(Symbol) %>%
+    summarise(log2_Fold_Change = mean(log2_Fold_Change, na.rm = TRUE))
+}
+```
+
+
+# ----------------------------- #
+#   Helper Function: Combine    #
+# ----------------------------- #
+
+```{r}
+# Merges the filtered datasets into one matrix for heatmap plotting
+create_combined_matrix <- function(list_of_data, labels) {
+  combined <- list_of_data[[1]] %>%
+    select(Symbol, log2_Fold_Change) %>%
+    rename(!!labels[1] := log2_Fold_Change)
+
+  for (i in 2:length(list_of_data)) {
+    temp <- list_of_data[[i]] %>%
+      select(Symbol, log2_Fold_Change) %>%
+      rename(!!labels[i] := log2_Fold_Change)
+    combined <- left_join(combined, temp, by = "Symbol")
+  }
+
+  # Convert to matrix with Symbol as rownames
+  combined_matrix <- combined %>%
+    column_to_rownames(var = "Symbol") %>%
+    as.matrix()
+
+  # Handle missing/NaN values
+  combined_matrix[is.na(combined_matrix)] <- 0
+  combined_matrix[is.nan(combined_matrix)] <- 0
+
+  return(combined_matrix)
+}
+```
+
+
+# ----------------------------- #
+#     Helper Function: Plot     #
+# ----------------------------- #
+
+```{r}
+# Creates a clustered heatmap from a matrix of log2 fold-change values
+plot_heatmap <- function(matrix_data, title) {
+  pheatmap(matrix_data,
+           cluster_rows = TRUE,
+           cluster_cols = TRUE,
+           scale = "row",  # Row-wise z-score normalization
+           color = colorRampPalette(c("blue", "white", "red"))(50),
+           main = title)
+}
+```
+
+
+# ----------------------------- #
+#         Main Pipeline         #
+# ----------------------------- #
+
+```{r}
+# Load log2FC tables for each cell type
+dataset_files <- list(
+  "Cell_Type_I.csv",
+  "Cell_Type_II.csv",
+  "Cell_Type_III.csv",
+  "Cell_Type_IV.csv"
+)
+
+# Define column labels (will appear in heatmap)
+labels <- c("Cell_Type_I", "Cell_Type_II", "Cell_Type_III", "Cell_Type_IV")
+
+# Read each dataset
+datasets <- lapply(dataset_files, read.csv)
+
+# Load gene list (custom curated)
+genes_of_interest <- read.csv("gene_list.csv")
+
+# --------- Full Gene Set Heatmap ---------
+processed_all <- lapply(datasets, process_dataset, genes_of_interest = genes_of_interest)
+heatmap_all <- create_combined_matrix(processed_all, labels)
+plot_heatmap(heatmap_all, "Log2 Fold Change Heatmap (All Selected Genes)")
+
+# --------- Significant Genes Only ---------
+processed_sig <- lapply(datasets, process_dataset, genes_of_interest = genes_of_interest, pval_cutoff = 0.05)
+heatmap_sig <- create_combined_matrix(processed_sig, labels)
+plot_heatmap(heatmap_sig, "Log2 Fold Change Heatmap (FDR < 0.05)")
+
+```
+
