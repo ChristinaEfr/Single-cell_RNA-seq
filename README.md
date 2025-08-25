@@ -17,3 +17,47 @@ This repository contains an R script to visualize **log₂ fold change gene expr
 ---
 
 
+> ⚠ **Note:** All files are anonymized and safe for public sharing. Replace with your own data.
+
+---
+
+##  Requirements
+
+Install the following R packages:
+```r
+install.packages(c("dplyr", "tidyverse", "pheatmap", "tibble"))
+```
+## How to Run
+
+1. Clone this repo or download the files
+
+2. Place your .csv input files into the data/ folder
+
+3. Edit gene_expression_heatmap.R to point to your files (if needed)
+
+4. Run in R or RStudio:
+
+```r
+source("gene_expression_heatmap.R")
+```
+
+---
+## Notes
+
+- The script expects your data files to contain at least:
+
+  - Symbol (gene symbol)
+
+  - log2_Fold_Change
+
+  - p_adjusted_value (for significance filtering)
+
+- The gene list file should contain a column named Gene
+
+- Heatmaps are row-normalized for visualization, highlighting expression patterns
+
+---
+
+## Acknowledgments
+
+This script was developed for visualizing gene expression patterns in a single-cell RNA-seq dataset. If you use or adapt this code, consider citing this repository or linking back.
