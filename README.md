@@ -14,10 +14,7 @@ This repository contains an R script to visualize **log₂ fold change gene expr
 - Averages duplicate gene entries
 - Creates heatmaps with `pheatmap`, clustered by rows and columns
 
----
 
-
-> ⚠ **Note:** All files are anonymized and safe for public sharing. Replace with your own data.
 
 ---
 
