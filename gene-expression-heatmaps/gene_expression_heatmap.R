@@ -59,18 +59,18 @@ plot_heatmap <- function(matrix_data, title) {
 #         Main Script           #
 # ----------------------------- #
 
-# Load datasets (rename files as needed before uploading to GitHub)
+# Load datasets (rename files as needed)
 dataset_files <- list(
-  "Cell_Type_I.csv",   # formerly Bystanders_II
-  "Cell_Type_II.csv",  # formerly TINs_II
-  "Cell_Type_III.csv", # formerly Bystanders_III
-  "Cell_Type_IV.csv"   # formerly TINs_III
+  "Cell_Type_I.csv",   
+  "Cell_Type_II.csv",  
+  "Cell_Type_III.csv", 
+  "Cell_Type_IV.csv"   
 )
 
 labels <- c("Cell_Type_I", "Cell_Type_II", "Cell_Type_III", "Cell_Type_IV")
 
 datasets <- lapply(dataset_files, read.csv)
-genes_of_interest <- read.csv("gene_list.csv")  # formerly SenMayo_murine_genelist.csv
+genes_of_interest <- read.csv("gene_list.csv") 
 
 # -------- Full Gene Set Heatmap --------
 processed_all <- lapply(datasets, process_dataset, genes_of_interest = genes_of_interest)
