@@ -1,6 +1,6 @@
-# Single-cell_RNA-seq
+# Single-nuclei_RNA-seq
 Heatmap of gene expression based on single-cell RNA-seq of 4 cell types. The analysis was done in R-studio.
-#  Single-Cell RNA-seq Heatmap Generator
+#  Single-nuclei RNA-seq Heatmap Generator
 
 This repository contains an R script to visualize **log₂ fold change gene expression** data from single-cell RNA-seq experiments across four different cell types. The goal is to extract expression patterns of selected genes of interest and display them as clustered heatmaps.
 
