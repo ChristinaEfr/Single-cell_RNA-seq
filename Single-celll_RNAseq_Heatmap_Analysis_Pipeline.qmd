@@ -1,10 +1,10 @@
 # ----------------------------- #
-#      SINGLE-CELL RNA-SEQ     #
+#      SINGLE-NUCLEI RNA-SEQ     #
 #   Heatmap Analysis Pipeline  #
 # ----------------------------- #
 
 # Description:
-# This script loads single-cell RNA-seq log2 fold-change values for a custom gene list
+# This script loads single-nuclei RNA-seq log2 fold-change values for a custom gene list
 # across four distinct cell types. It filters genes of interest, optionally applies
 # a p-value threshold, averages duplicate entries, and visualizes the results
 # as clustered heatmaps.
